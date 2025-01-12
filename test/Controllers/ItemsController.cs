@@ -8,10 +8,11 @@ using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using Azure.Core;
 using test.Repositories;
+using log4net;
 
 namespace test.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api")]
     [ApiController]
     public class ItemsController : ControllerBase
     {
@@ -28,18 +29,26 @@ namespace test.Controllers
             { "FG-00002", new Partner { Name = "FAKEPEOPLE", Password = "FAKEPASSWORD4578" } }
         };
 
+        private static readonly ILog log = LogManager.GetLogger(typeof(ItemsController)); // Get logger instance
 
-        [HttpPost]
+
+        [HttpPost("submittrxmessage")]
         public IActionResult requestApi(Models.Request request)
         {
+
+            string requestBody = System.Text.Json.JsonSerializer.Serialize(request);
+            log.Info($"Request Body: {requestBody}");
             // Validate model state
             if (!ModelState.IsValid)
             {
-                return BadRequest(new ErrorResponse
+                var errorResponse = new ErrorResponse
                 {
                     result = 0,
                     resultmessage = string.Join(" | ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage))
-                });
+                };
+                string responseBody = System.Text.Json.JsonSerializer.Serialize(errorResponse);
+                log.Error($"Validation Error Response: {responseBody}");
+                return BadRequest(errorResponse);
             }
 
             try
@@ -47,14 +56,20 @@ namespace test.Controllers
                 // Partner authentication
                 if (!ItemRepository.AuthenticatePartner(request.partnerrefno, request.partnerpassword, request.partnerkey,AllowedPartners))
                 {
-                    return Unauthorized(new ErrorResponse { result = 0, resultmessage = "Invalid Partner Key, Password, or Ref No." });
+                    var errorResponse = new ErrorResponse { result = 0, resultmessage = "Invalid Partner Key, Password, or Ref No." };
+                    string responseBody = System.Text.Json.JsonSerializer.Serialize(errorResponse);
+                    log.Warn($"Authentication Failed Response: {responseBody}");
+                    return Unauthorized(errorResponse);
                 }
 
                 // Timestamp validation
                 (bool isValid, string errorMessage) = ItemRepository.IsValidTimestamp(request.timestamp);
                 if (!isValid)
                 {
-                    return StatusCode(400, new ErrorResponse { result = 0, resultmessage = errorMessage });
+                    var errorResponse = new ErrorResponse { result = 0, resultmessage = errorMessage };
+                    string responseBody = System.Text.Json.JsonSerializer.Serialize(errorResponse);
+                    log.Warn($"Timestamp Validation Failed Response: {responseBody}");
+                    return BadRequest(errorResponse);
                 }
 
                 // Validate item details and total amount consistency
@@ -74,13 +89,16 @@ namespace test.Controllers
                 long finalAmount = totalAmount - discountAmount;
 
                 // Return success response
-                return Ok(new SuccessResponse
+                var successResponse = new SuccessResponse
                 {
                     result = 1,
                     totalamount = totalAmount,
                     totaldiscount = (int)discountAmount,
                     finalamount = finalAmount
-                });
+                };
+                string successResponseBody = System.Text.Json.JsonSerializer.Serialize(successResponse);
+                log.Info($"Success Response: {successResponseBody}");
+                return Ok(successResponse);
             }
             catch (Exception ex)
             {
