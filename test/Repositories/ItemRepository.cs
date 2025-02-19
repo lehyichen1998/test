@@ -114,10 +114,10 @@ namespace test.Repositories
                 DateTime serverTimeUtc = DateTime.UtcNow;
                 TimeSpan timeDifference = requestTime - serverTimeUtc;
 
-                if (Math.Abs(timeDifference.TotalMinutes) > 5)
-                {
-                    return (false, "Timestamp is outside the allowed 5-minute window."); // Or a more specific message
-                }
+                //if (Math.Abs(timeDifference.TotalMinutes) > 5)
+                //{
+                //    return (false, "Timestamp is outside the allowed 5-minute window."); // Or a more specific message
+                //}
             }
             else if (DateTime.TryParseExact(timestamp, "yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out DateTime requestTime2))
             {

@@ -30,7 +30,31 @@ namespace test.Controllers
         };
 
         private static readonly ILog log = LogManager.GetLogger(typeof(ItemsController)); // Get logger instance
+        /*
+        {
+  "partnerkey": "FAKEGOOGLE",
+  "partnerrefno": "FG-00001",
+  "partnerpassword": "RkFLRVBBU1NXT1JEMTIzNA==",
+  "totalamount": 1000,
+  "items": [
+    {
+      "partneritemref": "i-00001",
+      "name": "Pen",
+      "qty": 4,
+      "unitprice": 200
+    },
+    {
+      "partneritemref": "i-00002",
+      "name": "Ruler",
+      "qty": 2,
+      "unitprice": 100
+    }
+  ],
+  "timestamp": "2024-08-15T02:11:22.0000000Z",
+  "sig": " MDE3ZTBkODg4ZDNhYzU0ZDBlZWRmNmU2NmUyOWRhZWU4Y2M1NzQ1OTIzZGRjYTc1ZGNjOTkwYzg2MWJlMDExMw=="
+}
 
+        */
 
         [HttpPost("submittrxmessage")]
         public IActionResult requestApi(Models.Request request)
@@ -54,7 +78,7 @@ namespace test.Controllers
             try
             {
                 // Partner authentication
-                if (!ItemRepository.AuthenticatePartner(request.partnerrefno, request.partnerpassword, request.partnerkey,AllowedPartners))
+                if (!ItemRepository.AuthenticatePartner(request.partnerrefno, request.partnerpassword, request.partnerkey, AllowedPartners))
                 {
                     var errorResponse = new ErrorResponse { result = 0, resultmessage = "Invalid Partner Key, Password, or Ref No." };
                     string responseBody = System.Text.Json.JsonSerializer.Serialize(errorResponse);
@@ -108,7 +132,7 @@ namespace test.Controllers
         }
 
 
-      
+
 
 
 
