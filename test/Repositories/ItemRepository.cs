@@ -80,7 +80,7 @@ namespace test.Repositories
                     throw new Exception("Total amount is required when item details are provided.");
                 }
 
-                long calculatedTotal = request.items.Sum(item => (long)(item.qty * item.unitprice));
+                long calculatedTotal = request.items.Sum(item => (long)(item.qty * (item.unitprice/100)));
                 if (request.totalamount != calculatedTotal)
                 {
                     throw new Exception("Total amount does not match the sum of item details.");
@@ -99,7 +99,7 @@ namespace test.Repositories
                 return 0;
             }
 
-            return items.Sum(item => (long)(item.qty * item.unitprice));
+            return items.Sum(item => (long)(item.qty * (item.unitprice/100)));
         }
 
         internal static (bool isValid, string errorMessage) IsValidTimestamp(string timestamp)

@@ -77,8 +77,8 @@ namespace test.Controllers
 
             try
             {
-                //var totalamount = request.totalamount / 100;
-                //request.totalamount = totalamount;
+                var totalamount = request.totalamount / 100;
+                request.totalamount = totalamount;
                 // Partner authentication
                 if (!ItemRepository.AuthenticatePartner(request.partnerrefno, request.partnerpassword, request.partnerkey, AllowedPartners))
                 {
@@ -118,9 +118,9 @@ namespace test.Controllers
                 var successResponse = new SuccessResponse
                 {
                     result = 1,
-                    totalamount = totalAmount/100,
-                    totaldiscount = (int)discountAmount/100,
-                    finalamount = finalAmount / 100
+                    totalamount = totalAmount,
+                    totaldiscount = (int)discountAmount,
+                    finalamount = finalAmount
                 };
                 string successResponseBody = System.Text.Json.JsonSerializer.Serialize(successResponse);
                 log.Info($"Success Response: {successResponseBody}");
@@ -129,7 +129,7 @@ namespace test.Controllers
             catch (Exception ex)
             {
                 Console.Error.WriteLine(ex);
-                return StatusCode(500, new ErrorResponse { result = 0, resultmessage = "An error occurred during processing." });
+                return StatusCode(500, new ErrorResponse { result = 0, resultmessage = ex.ToString() });
             }
         }
 
