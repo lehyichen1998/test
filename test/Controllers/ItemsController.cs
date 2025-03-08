@@ -77,6 +77,8 @@ namespace test.Controllers
 
             try
             {
+                //var totalamount = request.totalamount / 100;
+                //request.totalamount = totalamount;
                 // Partner authentication
                 if (!ItemRepository.AuthenticatePartner(request.partnerrefno, request.partnerpassword, request.partnerkey, AllowedPartners))
                 {
@@ -116,9 +118,9 @@ namespace test.Controllers
                 var successResponse = new SuccessResponse
                 {
                     result = 1,
-                    totalamount = totalAmount,
-                    totaldiscount = (int)discountAmount,
-                    finalamount = finalAmount
+                    totalamount = totalAmount/100,
+                    totaldiscount = (int)discountAmount/100,
+                    finalamount = finalAmount / 100
                 };
                 string successResponseBody = System.Text.Json.JsonSerializer.Serialize(successResponse);
                 log.Info($"Success Response: {successResponseBody}");
